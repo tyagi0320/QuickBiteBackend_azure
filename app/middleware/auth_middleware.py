@@ -1,0 +1,44 @@
+from fastapi import Request
+from jose import JWTError, jwt
+from app.core.config import settings
+
+async def auth_middleware(request: Request, call_next):
+
+    ##This portion of code is for debugging render cors error
+    ###################################################################
+     # 1. Standard Practice: Skip CORS preflight requests
+    if request.method == "OPTIONS":
+        return await call_next(request)
+
+    # 2. Skip authentication for public routes
+    # Adjust these paths to match your actual route names (e.g., /api/v1/auth/login)
+    # public_paths = ["/login", "/register", "/foods", "/"]
+    public_paths = {"/login", "/register", "/foods", "/", "/docs", "/openapi.json"} 
+    if any(request.url.path.endswith(path) for path in public_paths):
+        return await call_next(request)
+    
+    ###################################################################
+
+
+    auth_header = request.headers.get("Authorization")
+
+    if auth_header and auth_header.startswith("Bearer"): #Update to "Bearer "
+        token = auth_header.split(" ")[1]  #use this token with "Bearer "
+        # token = auth_header.split(maxsplit=1)[1] 
+
+        try:
+            payload = jwt.decode(
+                token,
+                settings.SECRET_KEY,
+                algorithms=[settings.ALGORITHM]
+            )
+            request.state.user = {
+                "user_id": payload["user_id"],
+                "role": payload["role"]
+            }
+        except JWTError:
+            request.state.user = None
+    else:
+        request.state.user = None
+
+    return await call_next(request)
