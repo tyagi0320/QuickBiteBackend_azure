@@ -38,17 +38,17 @@ stages:
         tags: |
           $(tag)
 
-- stage: Deploy
-  displayName: Deploy to Azure
-  dependsOn: Build
-  jobs:
-  - job: Deploy
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: AzureContainerApps@1
-      inputs:
-        azureSubscription: 'MyAzureConn'
-        imageToDeploy: '$(containerRegistry)/$(imageRepository):$(tag)'
-        containerAppName: 'Quickbite'
-        resourceGroup: 'QuickBite_RG'
+# - stage: Deploy
+#   displayName: Deploy to Azure
+#   dependsOn: Build
+#   jobs:
+#   - job: Deploy
+#     pool:
+#       vmImage: 'ubuntu-latest'
+#     steps:
+#     - task: AzureContainerApps@1
+#       inputs:
+#         azureSubscription: 'MyAzureConn'
+#         imageToDeploy: '$(containerRegistry)/$(imageRepository):$(tag)'
+#         containerAppName: 'Quickbite'
+#         resourceGroup: 'QuickBite_RG'
